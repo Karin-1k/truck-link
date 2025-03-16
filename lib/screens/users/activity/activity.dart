@@ -25,11 +25,8 @@ class UserActivityPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-           
             _buildTripList('PENDING'),
-           
             _buildTripList('CANCELLED'),
-            
             _buildTripList('COMPLETED'),
           ],
         ),
@@ -37,14 +34,11 @@ class UserActivityPage extends StatelessWidget {
     );
   }
 
-
   Widget _buildTripList(String status) {
-    
     TripStatus tripStatus = _getTripStatusFromString(status);
 
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: usertripController.getTripsByStatusWithUserInfo(
-          tripStatus), 
+      stream: usertripController.getTripsByStatusWithUserInfo(tripStatus),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -68,7 +62,7 @@ class UserActivityPage extends StatelessWidget {
             return Card(
               margin: EdgeInsets.all(8.0),
               child: ListTile(
-                title: Text('Trip to ${trip['destination']}'),
+                title: Text('${trip['origin']} to ${trip['destination']}'),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -83,7 +77,6 @@ class UserActivityPage extends StatelessWidget {
                     ? IconButton(
                         icon: Icon(Icons.cancel),
                         onPressed: () {
-                   
                           usertripController.cancelTrip(trip['tripId']);
                         },
                       )
@@ -96,7 +89,6 @@ class UserActivityPage extends StatelessWidget {
     );
   }
 
-
   TripStatus _getTripStatusFromString(String status) {
     switch (status) {
       case 'PENDING':
@@ -106,7 +98,7 @@ class UserActivityPage extends StatelessWidget {
       case 'COMPLETED':
         return TripStatus.COMPLETE;
       default:
-        return TripStatus.WAITING; 
+        return TripStatus.WAITING;
     }
   }
 }
