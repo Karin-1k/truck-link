@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trucklink/global/appcolors.dart';
 import 'package:trucklink/screens/admin/admin_settings.dart';
 import 'package:trucklink/screens/admin/adminpage.dart';
 
@@ -31,16 +32,21 @@ class _AdminNavbarrState extends State<AdminNavbarr> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.verified),
-            label: 'verify',
+            label: 'Verify',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: 'setting',
+            label: 'Settings',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: AppColors.mainColor, // Set selected item color
+        unselectedItemColor: Colors.grey, // Set unselected item color
+        backgroundColor: Colors.white, // Set the background color of the navbar
         onTap: _onItemTapped,
+        type: BottomNavigationBarType
+            .fixed, // This helps if you want to keep more items fixed
+        elevation: 10, // Add elevation to make it stand out
       ),
     );
   }

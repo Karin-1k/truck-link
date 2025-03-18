@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:trucklink/global/appcolors.dart';
 import 'package:trucklink/screens/drivers/trip/trip_editing_screen.dart';
 import 'package:trucklink/state_managment/drivercontroller/trip_controller.dart'; // Import the TripStatus enum from here
 import 'package:intl/intl.dart';
@@ -13,10 +14,12 @@ class TripListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4, 
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: Text("Trip Statuses"),
+          backgroundColor: AppColors.mainColor,
+          centerTitle: true,
           bottom: TabBar(
             tabs: [
               Tab(text: 'Waiting'),
@@ -28,7 +31,6 @@ class TripListScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            
             _buildTripList(TripStatus.WAITING),
             _buildTripList(TripStatus.PENDING),
             _buildTripList(TripStatus.CANCEL),
@@ -64,16 +66,27 @@ class TripListScreen extends StatelessWidget {
 
             return Card(
               margin: EdgeInsets.all(10),
+              elevation: 4, // Raised effect with elevation
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12), // Rounded corners
+              ),
+              color: Colors.white, // Card color set to white
               child: ListTile(
-                title: Text("${trip["origin"]} to ${trip["destination"]}"),
+                contentPadding: EdgeInsets.all(16), // Padding inside the card
+                title: Text(
+                  "${trip["origin"]} to ${trip["destination"]}",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 5),
                     Text("Departure Date: $formattedDepartureDate"),
                     Text("Departure Time: $formattedDepartureTime"),
-                    Text("Status: ${trip["tripStatus"]}"),
-
+                    Text("Status: ${trip["tripStatus"]}",
+                        style: TextStyle(color: Colors.grey[700])),
                     if (status != TripStatus.WAITING) ...[
+                      SizedBox(height: 5),
                       Text("User Name: ${trip["userName"]}"),
                       Text("User Phone: ${trip["userPhone"]}"),
                     ]
@@ -96,7 +109,7 @@ class TripListScreen extends StatelessWidget {
       case 'WAITING':
         return [
           IconButton(
-            icon: Icon(Icons.edit, color: Colors.blue),
+            icon: Icon(Icons.edit, color: AppColors.mainColor),
             onPressed: () async {
               DocumentSnapshot tripDoc = await FirebaseFirestore.instance
                   .collection('trips')
@@ -122,19 +135,10 @@ class TripListScreen extends StatelessWidget {
                   trip["tripId"], trip["driverId"], trip["userId"]);
             },
           ),
-
-          // IconButton(
-          //   icon: Icon(Icons.check, color: Colors.green),
-          //   onPressed: () {
-          //     // Accept the trip
-          //     tripController.completeTrip(trip["tripId"]);
-          //   },
-          // ),
           IconButton(
             icon: Icon(Icons.cancel, color: Colors.orange),
             onPressed: () {
               userTripController.cancelTrip(trip["tripId"]);
-              
             },
           ),
         ];

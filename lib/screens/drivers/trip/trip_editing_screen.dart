@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:trucklink/global/appcolors.dart'; // Ensure this path is correct
 
 class TripEditScreen extends StatefulWidget {
   final String tripId;
@@ -30,21 +31,56 @@ class _TripEditScreenState extends State<TripEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Edit Trip")),
+      appBar: AppBar(
+        title: Text("Edit Trip"),
+        backgroundColor: AppColors.mainColor, // Set AppBar background color
+      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
+              // Origin TextField
               TextField(
                 controller: originController,
-                decoration: InputDecoration(labelText: "Origin"),
+                decoration: InputDecoration(
+                  labelText: "Origin",
+                  labelStyle:
+                      TextStyle(color: AppColors.mainColor), // Label color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0), // Rounded border
+                    borderSide:
+                        BorderSide(color: AppColors.mainColor), // Border color
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
               ),
+              SizedBox(height: 16.0), // Add some spacing
+
+              // Destination TextField
               TextField(
                 controller: destinationController,
-                decoration: InputDecoration(labelText: "Destination"),
+                decoration: InputDecoration(
+                  labelText: "Destination",
+                  labelStyle:
+                      TextStyle(color: AppColors.mainColor), // Label color
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0), // Rounded border
+                    borderSide:
+                        BorderSide(color: AppColors.mainColor), // Border color
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                ),
               ),
+              SizedBox(height: 16.0), // Add some spacing
+
+              // Select Departure Date Button
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mainColor, // Button color
+                ),
                 onPressed: () async {
                   departureDate = await showDatePicker(
                     context: context,
@@ -52,14 +88,26 @@ class _TripEditScreenState extends State<TripEditScreen> {
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2100),
                   );
-                  setState(() {}); 
+                  setState(() {});
                 },
-                child: Text("Select Departure Date"),
+                child: Text(
+                  "Select Departure Date",
+                  style: TextStyle(
+                      color: Colors.white), // White text color inside button
+                ),
               ),
               if (departureDate != null)
                 Text(
-                    "Selected Date: ${departureDate!.toLocal().toString().split(' ')[0]}"),
+                  "Selected Date: ${departureDate!.toLocal().toString().split(' ')[0]}",
+                  style: TextStyle(color: Colors.black),
+                ),
+              SizedBox(height: 16.0), // Add some spacing
+
+              // Select Departure Time Button
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mainColor, // Button color
+                ),
                 onPressed: () async {
                   TimeOfDay? time = await showTimePicker(
                     context: context,
@@ -73,15 +121,27 @@ class _TripEditScreenState extends State<TripEditScreen> {
                       time.hour,
                       time.minute,
                     );
-                    setState(() {}); 
+                    setState(() {});
                   }
                 },
-                child: Text("Select Departure Time"),
+                child: Text(
+                  "Select Departure Time",
+                  style: TextStyle(
+                      color: Colors.white), // White text color inside button
+                ),
               ),
               if (departureTime != null)
                 Text(
-                    "Selected Time: ${departureTime!.toLocal().toString().split(' ')[1].substring(0, 5)}"),
+                  "Selected Time: ${departureTime!.toLocal().toString().split(' ')[1].substring(0, 5)}",
+                  style: TextStyle(color: Colors.black),
+                ),
+              SizedBox(height: 16.0), // Add some spacing
+
+              // Save Changes Button
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mainColor, // Button color
+                ),
                 onPressed: () {
                   widget.tripData.reference.update({
                     'origin': originController.text,
@@ -89,16 +149,29 @@ class _TripEditScreenState extends State<TripEditScreen> {
                     'departureDate': departureDate!.toIso8601String(),
                     'departureTime': departureTime!.toIso8601String(),
                   });
-                  Get.back(); 
+                  Get.back();
                 },
-                child: Text("Save Changes"),
+                child: Text(
+                  "Save Changes",
+                  style: TextStyle(
+                      color: Colors.white), // White text color inside button
+                ),
               ),
+              SizedBox(height: 16.0), // Add some spacing
+
               // Cancel Button
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Red color for Cancel button
+                ),
                 onPressed: () {
-                  Get.back(); 
+                  Get.back();
                 },
-                child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(
+                      color: Colors.white), // White text color inside button
+                ),
               ),
             ],
           ),

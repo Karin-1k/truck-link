@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:trucklink/global/appcolors.dart';
 import 'package:trucklink/screens/users/activity/activity.dart';
 import 'package:trucklink/screens/users/home/homepage.dart';
 import 'package:trucklink/screens/users/setting/usersetting.dart';
-
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trucklink/state_managment/usercontroller/usertrip_controller.dart';
@@ -43,22 +42,25 @@ class _UserNavbarrState extends State<UserNavbarr> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'trips',
+            label: 'Trips',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
-            label: 'activity',
+            label: 'Activity',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: 'setting',
+            label: 'Settings',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor:
+            AppColors.mainColor, // Use AppColors.mainColor for selected item
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
     );
@@ -82,7 +84,7 @@ class FeedbackDialog extends StatelessWidget {
       "note": noteController.text,
       "rating": selectedRating.value,
     });
-    Get.back(); 
+    Get.back();
   }
 
   @override
@@ -92,7 +94,7 @@ class FeedbackDialog extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: Container(
-            width: 400, 
+            width: 400,
             padding: EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -115,7 +117,7 @@ class FeedbackDialog extends StatelessWidget {
                             ? Icons.star
                             : Icons.star_border,
                         color: Colors.amber,
-                        size: 32, 
+                        size: 32,
                       ),
                     );
                   }),
@@ -140,6 +142,11 @@ class FeedbackDialog extends StatelessWidget {
                     ElevatedButton(
                       onPressed: submitFeedback,
                       child: Text("Submit"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.mainColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
                     ),
                   ],
                 ),

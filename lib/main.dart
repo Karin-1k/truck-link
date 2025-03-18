@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
       initialBinding: ScreenBindings(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
       home: SplashPage(),
