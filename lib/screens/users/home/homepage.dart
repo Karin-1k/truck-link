@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logger/logger.dart';
 import 'package:trucklink/global/appcolors.dart';
+import 'package:trucklink/global/global_widgets.dart';
 
 import 'package:trucklink/state_managment/usercontroller/usertrip_controller.dart';
 
@@ -72,8 +74,93 @@ class UserHomePage extends StatelessWidget {
                         Text(
                             'Departure: ${formatDateTime(trip['departureDate'])}',
                             style: TextStyle(fontSize: 14)),
-                        Text('Driver: ${trip['driverName']}',
-                            style: TextStyle(fontSize: 14)),
+                        Row(
+                          children: [
+                            Text('Driver: ${trip['driverName']}',
+                                style: TextStyle(fontSize: 14)),
+                            IconButton(
+                                onPressed: () async {
+                                  lg.i(trip['driverId']);
+                                  final result = await tripController
+                                      .getDriverBonusAndRank(trip['driverId']);
+
+                                  int bonusPoints = result['bonusPoints'];
+                                  int rank = result['rank'];
+                                  int totalTrips = (bonusPoints / 10)
+                                      .floor(); // Each trip gives 10 points
+
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      backgroundColor: Colors.white,
+                                      title: Text(
+                                        "Driver Stats",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "🎯 Bonus Points",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            "$bonusPoints",
+                                            style: TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.blue),
+                                          ),
+                                          SizedBox(height: 12),
+                                          Text(
+                                            "🚚 Completed Trips",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            "$totalTrips",
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green),
+                                          ),
+                                          SizedBox(height: 12),
+                                          Text(
+                                            "🏅 Rank",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            "$rank of ${result['totalDrivers']} drivers",
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.orange),
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text("Close"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                icon: Icon(
+                                  Icons.person,
+                                  color: Colors.blue,
+                                ))
+                          ],
+                        ),
                         Text('Phone: ${trip['driverPhone']}',
                             style: TextStyle(fontSize: 14)),
                         Text('Vehicle Type: ${trip['vehicleType']}',

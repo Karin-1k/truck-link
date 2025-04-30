@@ -56,11 +56,9 @@ class UserAuthController extends GetxController {
           email: email, password: password);
       String uid = userCredential.user!.uid;
 
-     
       String? token = await userCredential.user!.getIdToken();
       if (token != null) await saveToken(token);
 
-  
       await firestore.collection("users").doc(uid).set({
         "uid": uid,
         "name": name,
@@ -82,13 +80,47 @@ class UserAuthController extends GetxController {
     }
   }
 
+  // Future<void> loginUser(String email, String password, context) async {
+  //   try {
+  //     UserCredential userCredential = await auth.signInWithEmailAndPassword(
+  //         email: email, password: password);
 
-  Future<void> loginUser(String email, String password, context) async {
+  //     String? token = await userCredential.user!.getIdToken();
+  //     if (token != null) await saveToken(token);
+
+  //     Navigator.pushAndRemoveUntil(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => UserNavbarr()),
+  //       (route) => false,
+  //     );
+  //   } catch (e) {
+  //     Get.snackbar("Error", e.toString());
+  //   }
+  // }
+
+  Future<void> loginUser(
+      String email, String password, BuildContext context) async {
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
 
-     
+      String uid = userCredential.user!.uid;
+
+      // Check if user exists in 'users' collection
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (!userDoc.exists) {
+        // Not a regular user, log them out and show error
+        await auth.signOut();
+        Get.snackbar(
+            "Access Denied", "This account is not registered as a user.");
+        return;
+      }
+
+      // Token and navigation
       String? token = await userCredential.user!.getIdToken();
       if (token != null) await saveToken(token);
 
@@ -106,7 +138,7 @@ class UserAuthController extends GetxController {
     try {
       await auth.signOut();
       await removeToken();
-     
+
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(

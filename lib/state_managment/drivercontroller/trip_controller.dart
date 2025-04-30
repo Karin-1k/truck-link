@@ -98,7 +98,10 @@ class TripController extends GetxController {
         "tripStatus": TripStatus.COMPLETE.toString().split('.').last,
       });
 
-      
+      await firestore.collection("drivers").doc(driverId).update({
+        "bonusPoints": FieldValue.increment(10),
+      });
+
       await firestore.collection("tripFeedback").add({
         "tripId": tripId,
         "driverId": driverId,
@@ -106,7 +109,7 @@ class TripController extends GetxController {
         "isAnswered": false,
         "note": "",
         "rating": 0,
-        "createdAt": FieldValue.serverTimestamp(), 
+        "createdAt": FieldValue.serverTimestamp(),
       });
 
       Get.snackbar("Success", "Trip completed and feedback entry created.");
@@ -134,15 +137,14 @@ class TripController extends GetxController {
         if (status == TripStatus.WAITING) {
           tripsWithUserInfo.add({
             ...trip,
-            "userName": "Unknown", 
-            "userPhone": "Unknown", 
-            "driverName": "Unknown", 
+            "userName": "Unknown",
+            "userPhone": "Unknown",
+            "driverName": "Unknown",
             "driverPhone": "Unknown",
           });
         } else {
-          String userId = trip["userId"]; 
-          String driverId =
-              trip["driverId"]; 
+          String userId = trip["userId"];
+          String driverId = trip["driverId"];
 
           var userSnapshot =
               await firestore.collection("users").doc(userId).get();
@@ -154,14 +156,11 @@ class TripController extends GetxController {
 
           tripsWithUserInfo.add({
             ...trip,
-            "userName": user?["name"] ??
-                "Unknown",
-            "userPhone": user?["phone"] ??
-                "Unknown", 
-            "driverName": driver?["name"] ?? "Unknown", 
+            "userName": user?["name"] ?? "Unknown",
+            "userPhone": user?["phone"] ?? "Unknown",
+            "driverName": driver?["name"] ?? "Unknown",
             "driverPhone": driver?["phone"] ?? "Unknown",
-            "vehicleType":
-                driver?["vehicleType"] ?? "Unknown", 
+            "vehicleType": driver?["vehicleType"] ?? "Unknown",
           });
         }
       }

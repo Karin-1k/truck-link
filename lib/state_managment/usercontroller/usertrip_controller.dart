@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart'; // Add this import for Fireba
 class UserTripController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  
   Stream<List<Map<String, dynamic>>> getWaitingTripsWithDriverInfo() {
     return firestore
         .collection("trips")
@@ -17,14 +16,12 @@ class UserTripController extends GetxController {
         .asyncMap((snapshot) async {
       List<Map<String, dynamic>> tripsWithDriverInfo = [];
       for (var doc in snapshot.docs) {
-    
         var trip = doc.data();
         String driverId = trip["driverId"];
 
         var driverSnapshot =
             await firestore.collection("drivers").doc(driverId).get();
         var driver = driverSnapshot.data();
-
 
         tripsWithDriverInfo.add({
           "tripId": trip["tripId"],
@@ -37,13 +34,13 @@ class UserTripController extends GetxController {
           "driverPhone": driver?["phone"],
           "vehicleType": driver?["vehicleType"],
           "rating": driver?["rating"],
+          "driverId": trip["driverId"]
         });
       }
       return tripsWithDriverInfo;
     });
   }
 
- 
   Future<void> updateTripStatusToPending(String tripId, String userId) async {
     try {
       await firestore.collection("trips").doc(tripId).update({
@@ -56,27 +53,23 @@ class UserTripController extends GetxController {
     }
   }
 
-  
   Stream<List<Map<String, dynamic>>> getTripsByStatusForUser(
       String status, String userId) {
     return firestore
         .collection("trips")
         .where("tripStatus", isEqualTo: status)
-        .where("userId", isEqualTo: userId) 
+        .where("userId", isEqualTo: userId)
         .snapshots()
         .asyncMap((snapshot) async {
       List<Map<String, dynamic>> trips = [];
       for (var doc in snapshot.docs) {
-     
         var trip = doc.data();
         String driverId = trip["driverId"];
 
-      
         var driverSnapshot =
             await firestore.collection("drivers").doc(driverId).get();
         var driver = driverSnapshot.data();
 
-      
         trips.add({
           "tripId": trip["tripId"],
           "departureDate": trip["departureDate"],
@@ -94,7 +87,6 @@ class UserTripController extends GetxController {
     });
   }
 
-
   Future<void> cancelTrip(String tripId) async {
     try {
       await firestore.collection("trips").doc(tripId).update({
@@ -105,7 +97,6 @@ class UserTripController extends GetxController {
       Get.snackbar("Error", "Failed to cancel trip: ${e.toString()}");
     }
   }
-
 
   Future<void> updateTripStatusToCompleted(String tripId) async {
     try {
@@ -120,7 +111,6 @@ class UserTripController extends GetxController {
 
   Stream<List<Map<String, dynamic>>> getTripsByStatusWithUserInfo(
       TripStatus status) {
-    
     String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     lg.i(currentUserId);
@@ -135,21 +125,17 @@ class UserTripController extends GetxController {
       for (var doc in snapshot.docs) {
         var trip = doc.data();
 
-    
         if (status == TripStatus.WAITING) {
-       
           tripsWithUserInfo.add({
             ...trip,
-            "userName": "Unknown", 
-            "userPhone": "Unknown", 
-            "driverName": "Unknown", 
-            "driverPhone": "Unknown", 
+            "userName": "Unknown",
+            "userPhone": "Unknown",
+            "driverName": "Unknown",
+            "driverPhone": "Unknown",
           });
         } else {
-          String driverId =
-              trip["driverId"]; 
+          String driverId = trip["driverId"];
 
-         
           var driverSnapshot =
               await firestore.collection("drivers").doc(driverId).get();
           var driver = driverSnapshot.data();
@@ -157,9 +143,8 @@ class UserTripController extends GetxController {
           tripsWithUserInfo.add({
             ...trip,
             "driverName": driver?["name"] ?? "Unknown",
-            "driverPhone": driver?["phone"] ?? "Unknown", 
-            "vehicleType":
-                driver?["vehicleType"] ?? "Unknown", 
+            "driverPhone": driver?["phone"] ?? "Unknown",
+            "vehicleType": driver?["vehicleType"] ?? "Unknown",
           });
         }
       }
@@ -167,7 +152,6 @@ class UserTripController extends GetxController {
     });
   }
 
- 
   Future<void> checkForUnansweredFeedback() async {
     String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (userId.isEmpty) return;
@@ -185,6 +169,41 @@ class UserTripController extends GetxController {
         FeedbackDialog(feedbackId: feedbackData.id),
         barrierDismissible: false,
       );
+    }
+  }
+
+  Future<Map<String, dynamic>> getDriverBonusAndRank(String driverId) async {
+    try {
+      // Fetch all drivers ordered by bonusPoints descending
+      QuerySnapshot allDriversSnapshot = await FirebaseFirestore.instance
+          .collection('drivers')
+          .orderBy('bonusPoints', descending: true)
+          .get();
+
+      int rank = 0;
+      int? bonusPoints;
+
+      for (int i = 0; i < allDriversSnapshot.docs.length; i++) {
+        var doc = allDriversSnapshot.docs[i];
+        if (doc.id == driverId) {
+          bonusPoints = doc['bonusPoints'] ?? 0;
+          rank = i + 1; // Rank is 1-based
+          break;
+        }
+      }
+
+      if (bonusPoints == null) {
+        throw Exception("Driver not found.");
+      }
+
+      return {
+        'bonusPoints': bonusPoints,
+        'rank': rank,
+        'totalDrivers': allDriversSnapshot.docs.length,
+      };
+    } catch (e) {
+      print("Error getting driver rank: $e");
+      rethrow;
     }
   }
 }

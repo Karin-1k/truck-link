@@ -110,15 +110,45 @@ class AuthController extends GetxController {
     }
   }
 
+  // void loginDriver(String email, String password, BuildContext context) async {
+  //   try {
+  //     UserCredential userCredential = await auth.signInWithEmailAndPassword(
+  //         email: email, password: password);
+  //     String? token = await userCredential.user!.getIdToken();
+  //     if (token != null) {
+  //       await saveToken(token);
+  //     }
+  //     checkUserState();
+  //   } catch (e) {
+  //     Get.snackbar("Error", e.toString());
+  //   }
+  // }
   void loginDriver(String email, String password, BuildContext context) async {
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
           email: email, password: password);
+
+      String uid = userCredential.user!.uid;
+
+      // Check if user exists in 'drivers' collection
+      DocumentSnapshot driverDoc =
+          await FirebaseFirestore.instance.collection('drivers').doc(uid).get();
+
+      if (!driverDoc.exists) {
+        // Not a driver, log them out and show error
+        await auth.signOut();
+        Get.snackbar(
+            "Access Denied", "This account is not registered as a driver.");
+        return;
+      }
+
+      // Get token and continue
       String? token = await userCredential.user!.getIdToken();
       if (token != null) {
         await saveToken(token);
       }
-      checkUserState();
+
+      checkUserState(); // Continue with driver-specific navigation
     } catch (e) {
       Get.snackbar("Error", e.toString());
     }
@@ -143,13 +173,11 @@ class AuthController extends GetxController {
 
   final _scopes = [drive.DriveApi.driveScope];
 
-  
   Future<AuthClient> getHttpClient() async {
     final credentials = ServiceAccountCredentials.fromJson(
         File("credentials.json").readAsStringSync());
     return await clientViaServiceAccount(credentials, _scopes);
   }
-
 
   Future<String?> uploadFileToGoogleDrive(File file) async {
     final client = await getHttpClient();
@@ -159,9 +187,8 @@ class AuthController extends GetxController {
     var driveFile = drive.File()..name = basename(file.path);
 
     var response = await driveApi.files.create(driveFile, uploadMedia: media);
-    return response.id; 
+    return response.id;
   }
-
 
   Future<void> uploadLicense(
       String uid, File image, BuildContext context) async {
@@ -194,13 +221,11 @@ class AuthController extends GetxController {
 class GoogleDriveService {
   final _scopes = [drive.DriveApi.driveScope];
 
-
   Future<AuthClient> getHttpClient() async {
     final credentials = ServiceAccountCredentials.fromJson(
         File("credentials.json").readAsStringSync());
     return await clientViaServiceAccount(credentials, _scopes);
   }
-
 
   Future<String?> uploadFileToGoogleDrive(File file) async {
     final client = await getHttpClient();
@@ -210,6 +235,6 @@ class GoogleDriveService {
     var driveFile = drive.File()..name = basename(file.path);
 
     var response = await driveApi.files.create(driveFile, uploadMedia: media);
-    return response.id; 
+    return response.id;
   }
 }
