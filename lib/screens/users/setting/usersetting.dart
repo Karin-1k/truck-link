@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:trucklink/global/appcolors.dart';
 import 'package:trucklink/state_managment/drivercontroller/auth_controller.dart';
 import 'package:trucklink/state_managment/usercontroller/userauth_controller.dart';
+import 'package:trucklink/screens/users/setting/userprofilepages.dart';
 
 class UserSettingsPage extends StatelessWidget {
   UserSettingsPage({super.key});
@@ -13,8 +14,8 @@ class UserSettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
-        backgroundColor:
-            AppColors.mainColor, centerTitle: true,
+        backgroundColor: AppColors.mainColor,
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,6 +30,18 @@ class UserSettingsPage extends StatelessWidget {
             //     Get.toNamed('/profile'); // Navigate to profile page
             //   },
             // ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Profile'),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserProfilePage(),
+                    ));
+              },
+            ),
 
             const Spacer(),
             Center(

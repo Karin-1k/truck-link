@@ -94,7 +94,7 @@ class TripListScreen extends StatelessWidget {
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: _buildActionButtons(trip),
+                  children: _buildActionButtons(trip, context),
                 ),
               ),
             );
@@ -104,7 +104,7 @@ class TripListScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildActionButtons(var trip) {
+  List<Widget> _buildActionButtons(var trip, context) {
     switch (trip["tripStatus"]) {
       case 'WAITING':
         return [
@@ -133,6 +133,11 @@ class TripListScreen extends StatelessWidget {
             onPressed: () {
               tripController.completeTrip(
                   trip["tripId"], trip["driverId"], trip["userId"]);
+              // Show dialog after completion
+              showDialog(
+                context: context,
+                builder: (_) => PaymentDialog(),
+              );
             },
           ),
           IconButton(
@@ -148,5 +153,86 @@ class TripListScreen extends StatelessWidget {
       default:
         return [];
     }
+  }
+}
+
+class PaymentDialog extends StatefulWidget {
+  @override
+  _PaymentDialogState createState() => _PaymentDialogState();
+}
+
+class _PaymentDialogState extends State<PaymentDialog> {
+  String? selectedImage;
+  String? selectedMethodName;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(selectedMethodName ?? 'Choose Payment Method'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (selectedImage == null)
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedImage = 'assets/img/fib.jpg';
+                      selectedMethodName = 'FIB';
+                    });
+                  },
+                  child: const Text('FIB'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedImage = 'assets/img/fastpay.jpg';
+                      selectedMethodName = 'FastPay';
+                    });
+                  },
+                  child: const Text('FastPay'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedImage = 'assets/img/zain.jpg';
+                      selectedMethodName = 'Zain';
+                    });
+                  },
+                  child: const Text('Zain'),
+                ),
+              ],
+            )
+          else
+            Column(
+              children: [
+                Image.asset(
+                  selectedImage!,
+                  width: 200,
+                  height: 200,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedImage = null;
+                      selectedMethodName = null;
+                    });
+                  },
+                  child: const Text('Back'),
+                ),
+              ],
+            ),
+        ],
+      ),
+      actions: [
+        if (selectedImage == null)
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+      ],
+    );
   }
 }

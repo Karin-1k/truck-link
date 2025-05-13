@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:trucklink/state_managment/drivercontroller/auth_controller.dart';
-import 'package:trucklink/global/appcolors.dart'; // Ensure this is the correct import for your color theme
+import 'package:trucklink/global/appcolors.dart';
+import 'package:trucklink/screens/drivers/setting/driverprofilepages.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
   final AuthController authController = Get.put(AuthController());
 
   @override
@@ -29,6 +36,20 @@ class SettingsPage extends StatelessWidget {
             //     Get.toNamed('/profile'); // Navigate to profile page
             //   },
             // ),
+
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Profile'),
+              trailing: Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePageScreen(),
+                    ));
+              },
+            ),
+
             const Spacer(),
             Center(
               child: ElevatedButton.icon(
@@ -43,7 +64,7 @@ class SettingsPage extends StatelessWidget {
                       color: Colors.white), // Ensures the text is white
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.mainColor, 
+                  backgroundColor: AppColors.mainColor,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
